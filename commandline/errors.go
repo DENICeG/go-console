@@ -4,8 +4,11 @@ import (
 	"fmt"
 )
 
-var errExit = fmt.Errorf("exit application")
-var errCtrlC = fmt.Errorf("Ctrl+C")
+// ErrExit is returned when the user wants to exit the application.
+var ErrExit = fmt.Errorf("exit application")
+
+// ErrCtrlC is returned when the user wants to stop the application.
+var ErrCtrlC = fmt.Errorf("Ctrl+C")
 
 type errUnknownCommand struct {
 	commandName string
