@@ -1,4 +1,4 @@
-module github.com/DENICeG/go-console
+module github.com/DENICeG/go-console/v2
 
 go 1.23.2
 
