@@ -1,3 +1,4 @@
+//go:build !windows
 // +build !windows
 
 package input
@@ -19,7 +20,7 @@ func newScreen() (screen, error) {
 }
 
 func (s *unixScreen) Clear() {
-	termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
+	termbox.Clear(termbox.ColorDefault, termbox.ColorDefault) //nolint
 }
 func (s *unixScreen) Size() (int, int) {
 	return termbox.Size()

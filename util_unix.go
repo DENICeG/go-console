@@ -84,9 +84,11 @@ func readKey() (Key, rune, error) {
 	if len(ttyBuffer) > 0 {
 		// use buffered data from previous readKey call
 		bufLen = len(ttyBuffer)
+
 		for i := 0; i < len(ttyBuffer); i++ {
 			buf[i] = ttyBuffer[i]
 		}
+
 		ttyBuffer = []byte{}
 
 	} else {

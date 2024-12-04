@@ -1,6 +1,7 @@
 package commandline
 
 import (
+	"errors"
 	"fmt"
 	"sort"
 	"strings"
@@ -76,7 +77,7 @@ func readCommand(prompt string, opts *ReadCommandOptions) ([]string, error) {
 
 func readCommandLine(prompt *string, currentCommand string, escapeHistory bool, opts *ReadCommandOptions) (string, error) {
 	if prompt != nil {
-		console.Printf("%s> ", *prompt)
+		console.Printf("%s> ", *prompt) //nolint
 	}
 
 	var cmdToString func([]string) string
@@ -144,11 +145,9 @@ func readCommandLine(prompt *string, currentCommand string, escapeHistory bool, 
 			return "", err
 		}
 
-		//TODO move caret along line
-
 		switch key {
 		case console.KeyCtrlC:
-			return "", ErrCtrlC()
+			return "", errCtrlC
 
 		case console.KeyEscape:
 			clearLine()
@@ -187,12 +186,10 @@ func readCommandLine(prompt *string, currentCommand string, escapeHistory bool, 
 				if len(cmd) == 0 {
 					// append virtual entry to complete commands
 					cmd = []string{""}
-				} else {
-					if str[len(str)-1] == ' ' {
-						// new command part already started by whitespace, but not recognized as part of command
-						// -> append empty command part for processing
-						cmd = append(cmd, "")
-					}
+				} else if str[len(str)-1] == ' ' {
+					// new command part already started by whitespace, but not recognized as part of command
+					// -> append empty command part for processing
+					cmd = append(cmd, "")
 				}
 
 				prefix := cmd[len(cmd)-1]
@@ -379,15 +376,13 @@ func Quote(str string) string {
 	if NeedQuote(str) {
 		return fmt.Sprintf("\"%s\"", strings.ReplaceAll(strings.ReplaceAll(str, "\\", "\\\\"), "\"", "\\\""))
 	}
+
 	return str
 }
 
 // NeedQuote returns true when the string contains characters that need to be quoted or escaped.
 func NeedQuote(str string) bool {
-	if strings.Contains(str, " ") {
-		return true
-	}
-	return false
+	return strings.Contains(str, " ")
 }
 
 // Escape returns a string that escapes all special chars.
@@ -398,6 +393,7 @@ func Escape(str string) string {
 	str = strings.ReplaceAll(str, " ", "\\ ")
 	str = strings.ReplaceAll(str, "\n", "\\\n")
 	str = strings.ReplaceAll(str, "\r", "\\\r")
+
 	return str
 }
 
@@ -436,10 +432,10 @@ func NewEnvironment() *Environment {
 		},
 		CompleteUnknownCommand: nil,
 		ErrorHandler: func(_ string, _ []string, err error) error {
-			if IsErrCommandPanicked(err) {
-				console.Printlnf("PANIC: %s", err.Error())
+			if errors.Is(err, errCommandPanicked{}) {
+				console.Printlnf("PANIC: %s", err.Error()) //nolint
 			} else {
-				console.Printlnf("ERROR: %s", err.Error())
+				console.Printlnf("ERROR: %s", err.Error()) //nolint
 			}
 			return nil
 		},
@@ -508,12 +504,13 @@ func (b *Environment) Run() error {
 
 		if len(cmd) > 0 {
 			if err := b.ExecCommand(cmd[0], cmd[1:]); err != nil {
-				if IsErrExit(err) {
+				if errors.Is(err, errExit) {
 					return nil
 				}
 				if b.ErrorHandler == nil {
 					return err
 				}
+
 				b.ErrorHandler(cmd[0], cmd[1:], err)
 			}
 		}
@@ -547,7 +544,7 @@ func (b *Environment) GetCompletionOptions(currentCommand []string, entryIndex i
 
 // ExecCommand executes a command as if it has been entered in terminal.
 func (b *Environment) ExecCommand(cmd string, args []string) error {
-	var recovered interface{}
+	var recovered any
 
 	err := func() error {
 		defer func() {
@@ -582,7 +579,7 @@ type PrintOptionsHandler func([]CompletionOption)
 func DefaultOptionsPrinter() PrintOptionsHandler {
 	return func(options []CompletionOption) {
 		if len(options) > maxAutoPrintListLen {
-			console.Printlnf("  print all %d options? (y/N)", len(options))
+			console.Printlnf("  print all %d options? (y/N)", len(options)) //nolint
 			// assume is only called during command reading here (keyboard needs to be prepared)
 			_, r, err := console.ReadKey()
 			if err != nil {
@@ -594,7 +591,7 @@ func DefaultOptionsPrinter() PrintOptionsHandler {
 			}
 		}
 
-		console.PrintList(options)
+		console.PrintList(options) //nolint
 	}
 }
 
@@ -638,7 +635,7 @@ func NewExitCommand(name string) Command {
 	return &customCommand{
 		name:              name,
 		completionHandler: func([]string, int) []CompletionOption { return nil },
-		execHandler:       func([]string) error { return ErrExit() },
+		execHandler:       func([]string) error { return errExit },
 	}
 }
 

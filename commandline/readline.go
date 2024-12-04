@@ -22,8 +22,6 @@ func NewLineHistory(maxCount int) LineHistory {
 
 // Put saves a new command to the history as latest entry.
 func (h *memoryLineHistory) Put(line string) {
-	//TODO command deduplication
-
 	h.history[h.pos] = line
 	h.pos = (h.pos + 1) % len(h.history)
 	if h.count < len(h.history) {
@@ -45,7 +43,7 @@ func ReadLineWithHistory(history LineHistory) (string, error) {
 	if err := console.BeginReadKey(); err != nil {
 		return "", err
 	}
-	defer console.EndReadKey()
+	defer console.EndReadKey() //nolint
 
 	return readLineWithHistory(history)
 }

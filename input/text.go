@@ -19,6 +19,7 @@ func newTextEditor(str string) *textEditor {
 	for i := 0; i < len(strLines); i++ {
 		lines[i] = []rune(strLines[i])
 	}
+
 	return &textEditor{InsertMode: false, lines: lines, caretLine: 0, caretPos: 0}
 }
 
@@ -95,8 +96,8 @@ func (e *textEditor) MoveCaretUp(delta int) bool {
 	e.caretLine -= delta
 	if e.caretLine < 0 {
 		e.caretLine = 0
-		//e.caretPos = 0
 	}
+
 	return true
 }
 
@@ -104,8 +105,8 @@ func (e *textEditor) MoveCaretDown(delta int) bool {
 	e.caretLine += delta
 	if e.caretLine >= len(e.lines) {
 		e.caretLine = len(e.lines) - 1
-		//e.caretPos = len(e.lines[e.caretLine])
 	}
+
 	return true
 }
 
@@ -183,7 +184,8 @@ func (e *textEditor) RemoveLeftOfCaret() bool {
 		for i := 0; i < caretLine; i++ {
 			newLines[i] = e.lines[i]
 		}
-		newLines[caretLine-1] = append(e.lines[caretLine-1], e.lines[caretLine]...)
+
+		newLines[caretLine-1] = append(e.lines[caretLine-1], e.lines[caretLine]...) //nolint
 		for i := (caretLine + 1); i < len(e.lines); i++ {
 			newLines[i-1] = e.lines[i]
 		}
@@ -214,7 +216,7 @@ func (e *textEditor) RemoveRightOfCaret() bool {
 		for i := 0; i <= caretLine; i++ {
 			newLines[i] = e.lines[i]
 		}
-		newLines[caretLine] = append(e.lines[caretLine], e.lines[caretLine+1]...)
+		newLines[caretLine] = append(e.lines[caretLine], e.lines[caretLine+1]...) //nolint
 		for i := (caretLine + 2); i < len(e.lines); i++ {
 			newLines[i-1] = e.lines[i]
 		}
@@ -222,26 +224,6 @@ func (e *textEditor) RemoveRightOfCaret() bool {
 		return true
 	}
 	return false
-}
-
-func max(values ...int) int {
-	maxVal := values[0]
-	for i := 1; i < len(values); i++ {
-		if values[i] > maxVal {
-			maxVal = values[i]
-		}
-	}
-	return maxVal
-}
-
-func min(values ...int) int {
-	minVal := values[0]
-	for i := 1; i < len(values); i++ {
-		if values[i] < minVal {
-			minVal = values[i]
-		}
-	}
-	return minVal
 }
 
 func boundBy(val int, min, max int) int {
@@ -254,7 +236,7 @@ func boundBy(val int, min, max int) int {
 	return val
 }
 
-// Text opens a fullscreen text editor in console mode and returns the entered string.
+// Text opens a full screen text editor in console mode and returns the entered string.
 func Text(str string) (string, bool, error) {
 	screen, err := newScreen()
 	if err != nil {
@@ -276,8 +258,6 @@ func Text(str string) (string, bool, error) {
 		editorOffsetY := 1
 		editorWidth := viewportWidth - 2
 		editorHeight := viewportHeight - 3
-
-		//TODO skip draw when inserting large data
 
 		// draw outer box
 		for x := editorOffsetX; x < (editorOffsetX + editorWidth); x++ {

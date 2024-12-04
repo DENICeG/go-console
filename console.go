@@ -7,7 +7,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"golang.org/x/crypto/ssh/terminal"
+	"golang.org/x/term"
 )
 
 const (
@@ -57,42 +57,42 @@ func (d *defaultOutput) Print(str string) (int, error) {
 }
 
 // Print writes a set of objects separated by whitespaces to Stdout.
-func Print(a ...interface{}) (int, error) {
+func Print(a ...any) (int, error) {
 	return DefaultOutput.Print(fmt.Sprint(a...))
 }
 
 // Printf writes a formatted string to Stdout.
-func Printf(format string, a ...interface{}) (int, error) {
+func Printf(format string, a ...any) (int, error) {
 	return DefaultOutput.Print(fmt.Sprintf(format, a...))
 }
 
 // Println writes a set of objects separated by whitespaces to Stdout and ends the line.
-func Println(a ...interface{}) (int, error) {
+func Println(a ...any) (int, error) {
 	return DefaultOutput.Print(fmt.Sprintln(a...))
 }
 
 // Printlnf writes a formatted string to Stdout and ends the line.
-func Printlnf(format string, a ...interface{}) (int, error) {
+func Printlnf(format string, a ...any) (int, error) {
 	return Println(fmt.Sprintf(format, a...))
 }
 
 // Fatal calls Print and exits with code 1.
-func Fatal(a ...interface{}) {
+func Fatal(a ...any) {
 	fatalWrapper(Print(a...))
 }
 
 // Fatalf calls Printf and exits with code 1.
-func Fatalf(format string, a ...interface{}) {
+func Fatalf(format string, a ...any) {
 	fatalWrapper(Printf(format, a...))
 }
 
 // Fatalln calls Println and exits with code 1.
-func Fatalln(a ...interface{}) {
+func Fatalln(a ...any) {
 	fatalWrapper(Println(a...))
 }
 
 // Fatallnf calls Printlnf and exits with code 1.
-func Fatallnf(format string, a ...interface{}) {
+func Fatallnf(format string, a ...any) {
 	fatalWrapper(Printlnf(format, a...))
 }
 
@@ -105,7 +105,7 @@ func fatalWrapper(int, error) {
 }
 
 // PrintList prints all array or map values in a regular grid.
-func PrintList(obj interface{}) error {
+func PrintList(obj any) error {
 	width, _, err := GetSize()
 	if err != nil {
 		return err
@@ -154,7 +154,7 @@ func PrintList(obj interface{}) error {
 	return err
 }
 
-func toList(obj interface{}) []string {
+func toList(obj any) []string {
 	if obj == nil {
 		return nil
 	}
@@ -190,7 +190,7 @@ func toList(obj interface{}) []string {
 }
 
 func (d *defaultOutput) GetSize() (int, int, error) {
-	return terminal.GetSize(int(os.Stdout.Fd()))
+	return term.GetSize(int(os.Stdout.Fd()))
 }
 
 // GetSize returns the current terminal dimensions in characters.

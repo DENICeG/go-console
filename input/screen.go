@@ -12,7 +12,7 @@ type screen interface {
 	Close()
 }
 
-type event interface{}
+type event any
 
 type errorEvent struct {
 	Error error
