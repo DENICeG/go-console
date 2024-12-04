@@ -37,7 +37,7 @@ func TestReadKey(t *testing.T) {
 	defer func() {
 		DefaultInput = oldInput
 	}()
-	DefaultInput = &keyFakeInput{KeyEnter, '\n', nil, false}
+	DefaultInput = &keyFakeInput{Key: KeyEnter, Rune: '\n', Error: nil, isReading: false}
 
 	BeginReadKey()
 	defer EndReadKey()
@@ -49,9 +49,9 @@ func TestReadKey(t *testing.T) {
 }
 
 type keyFakeInput struct {
-	Key       Key
-	Rune      rune
 	Error     error
+	Rune      rune
+	Key       Key
 	isReading bool
 }
 

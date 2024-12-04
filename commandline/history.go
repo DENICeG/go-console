@@ -7,13 +7,16 @@ type CommandHistory interface {
 }
 
 type memoryCommandHistory struct {
-	maxCount int
 	history  [][]string
+	maxCount int
 }
 
 // NewCommandHistory returns a new command history for maxCount entries.
 func NewCommandHistory(maxCount int) CommandHistory {
-	return &memoryCommandHistory{maxCount, make([][]string, 0)}
+	return &memoryCommandHistory{
+		maxCount: maxCount,
+		history:  make([][]string, 0),
+	}
 }
 
 // Put saves a new command to the history as latest entry.

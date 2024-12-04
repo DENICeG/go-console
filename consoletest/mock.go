@@ -10,9 +10,9 @@ import (
 )
 
 type ReadKeyResult struct {
-	Key   console.Key
-	Rune  rune
 	Error error
+	Rune  rune
+	Key   console.Key
 }
 
 type MockInput struct {
@@ -29,23 +29,23 @@ func (m *MockInput) PutString(buffer string) {
 	for _, r := range buffer {
 		switch r {
 		case '\r':
-			m.buffer = append(m.buffer, ReadKeyResult{console.KeyBackspace, 0, nil})
+			m.buffer = append(m.buffer, ReadKeyResult{Key: console.KeyBackspace, Rune: 0, Error: nil})
 		case '\n':
-			m.buffer = append(m.buffer, ReadKeyResult{console.KeyEnter, 0, nil})
+			m.buffer = append(m.buffer, ReadKeyResult{Key: console.KeyEnter, Rune: 0, Error: nil})
 		case ' ':
-			m.buffer = append(m.buffer, ReadKeyResult{console.KeySpace, 0, nil})
+			m.buffer = append(m.buffer, ReadKeyResult{Key: console.KeySpace, Rune: 0, Error: nil})
 		case '\t':
-			m.buffer = append(m.buffer, ReadKeyResult{console.KeyTab, 0, nil})
+			m.buffer = append(m.buffer, ReadKeyResult{Key: console.KeyTab, Rune: 0, Error: nil})
 
 		default:
-			m.buffer = append(m.buffer, ReadKeyResult{0, r, nil})
+			m.buffer = append(m.buffer, ReadKeyResult{Key: 0, Rune: r, Error: nil})
 		}
 	}
 }
 
 func (m *MockInput) PutKeys(keys ...console.Key) {
 	for _, k := range keys {
-		m.buffer = append(m.buffer, ReadKeyResult{k, 0, nil})
+		m.buffer = append(m.buffer, ReadKeyResult{Key: k, Rune: 0, Error: nil})
 	}
 }
 

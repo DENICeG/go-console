@@ -15,9 +15,10 @@ const (
 
 var (
 	// remember the last time Tab was pressed to detect double-tab.
-	lastTabPress  = time.Unix(0, 0)
-	doubleTabSpan = 250 * time.Millisecond
+	lastTabPress = time.Unix(0, 0)
 )
+
+const doubleTabSpan = 250 * time.Millisecond
 
 // CommandHistoryHandler describes a function that returns a command from history at the given index.
 //
@@ -91,13 +92,13 @@ func readCommandLine(prompt *string, currentCommand string, escapeHistory bool, 
 
 	putRune := func(r rune) {
 		sb.WriteRune(r)
-		console.Print(string(r))
+		console.Print(string(r)) //nolint
 		lineLen++
 	}
 
 	putString := func(str string) {
 		sb.WriteString(str)
-		console.Print(str)
+		console.Print(str) //nolint
 		lineLen += len(str)
 	}
 
@@ -105,7 +106,7 @@ func readCommandLine(prompt *string, currentCommand string, escapeHistory bool, 
 		sb.Reset()
 		str1 := strings.Repeat("\b", lineLen)
 		str2 := strings.Repeat(" ", lineLen)
-		console.Printf("%s%s%s", str1, str2, str1)
+		console.Printf("%s%s%s", str1, str2, str1) //nolint
 		lineLen = 0
 	}
 
@@ -116,9 +117,9 @@ func readCommandLine(prompt *string, currentCommand string, escapeHistory bool, 
 
 	reprintLine := func() {
 		if prompt == nil {
-			console.Printf("%s", sb.String())
+			console.Printf("%s", sb.String()) //nolint
 		} else {
-			console.Printf("%s> %s", *prompt, sb.String())
+			console.Printf("%s> %s", *prompt, sb.String()) //nolint
 		}
 	}
 
@@ -130,7 +131,7 @@ func readCommandLine(prompt *string, currentCommand string, escapeHistory bool, 
 				sb.WriteString(string(str[:len(str)-1]))
 			}
 
-			console.Print("\b \b")
+			console.Print("\b \b") //nolint
 			lineLen--
 		}
 	}
@@ -196,7 +197,7 @@ func readCommandLine(prompt *string, currentCommand string, escapeHistory bool, 
 
 				prefix := cmd[len(cmd)-1]
 				options := filterOptions(opts.GetCompletionOptions(cmd, len(cmd)-1), prefix)
-				if options != nil && len(options) > 0 {
+				if len(options) > 0 {
 					if time.Since(lastTabPress) < doubleTabSpan {
 						if opts.PrintOptionsHandler != nil {
 							// double-tab detected -> print options
@@ -315,7 +316,6 @@ func ParseCommand(str string) (parts []string, isComplete bool) {
 			} else {
 				sb.WriteRune(r)
 			}
-
 		} else if doubleQuote {
 			if escape {
 				if r != '\\' && r != '$' && r != '"' {
@@ -324,7 +324,6 @@ func ParseCommand(str string) (parts []string, isComplete bool) {
 				}
 				sb.WriteRune(r)
 				escape = false
-
 			} else {
 				if r == '"' {
 					doubleQuote = false
@@ -393,7 +392,6 @@ func NeedQuote(str string) bool {
 
 // Escape returns a string that escapes all special chars.
 func Escape(str string) string {
-	//TODO revise escape
 	str = strings.ReplaceAll(str, "\\", "\\\\")
 	str = strings.ReplaceAll(str, "\"", "\\\"")
 	str = strings.ReplaceAll(str, "'", "\\'")
@@ -405,23 +403,15 @@ func Escape(str string) string {
 
 // Environment represents a command line interface environment with history and auto-completion.
 type Environment struct {
-	// Prompt is called when displaying a command line prompt.
-	Prompt PromptHandler
-	// PrintOptions is called for double-tab option printing.
-	PrintOptions PrintOptionsHandler
-	// UnknownCommandHandler is called to handle unknown commands. Can be nil to return an unknown command error instead.
-	ExecUnknownCommand ExecUnknownCommandHandler
-	// UnknownCommandCompletionHandler is used for completion of unknown commands.
-	CompleteUnknownCommand CommandCompletionHandler
-	// ErrorHandler is called to handle errors returned from commands. Use RecoverPanickedCommands to also handle panics here.
-	ErrorHandler CommandErrorHandler
-	// RecoverPanickedCommands sets whether the ErrorHandler is also called for panics.
-	RecoverPanickedCommands bool
-	// UseCommandNameCompletion denotes whether completion is available for command names.
+	history                  CommandHistory
+	Prompt                   PromptHandler
+	PrintOptions             PrintOptionsHandler
+	ExecUnknownCommand       ExecUnknownCommandHandler
+	CompleteUnknownCommand   CommandCompletionHandler
+	ErrorHandler             CommandErrorHandler
+	commands                 map[string]Command
+	RecoverPanickedCommands  bool
 	UseCommandNameCompletion bool
-
-	history  CommandHistory
-	commands map[string]Command
 }
 
 // PromptHandler defines a function that returns the current command line prompt.
@@ -622,9 +612,9 @@ type Command interface {
 type ExecCommandHandler func(args []string) error
 
 type customCommand struct {
-	name              string
 	completionHandler CommandCompletionHandler
 	execHandler       ExecCommandHandler
+	name              string
 }
 
 func (c *customCommand) Name() string {
@@ -645,15 +635,27 @@ func (c *customCommand) Exec(args []string) error {
 
 // NewExitCommand returns a named command to stop command line processing.
 func NewExitCommand(name string) Command {
-	return &customCommand{name, func([]string, int) []CompletionOption { return nil }, func([]string) error { return ErrExit() }}
+	return &customCommand{
+		name:              name,
+		completionHandler: func([]string, int) []CompletionOption { return nil },
+		execHandler:       func([]string) error { return ErrExit() },
+	}
 }
 
 // NewParameterlessCommand returns a named command that takes no parameters.
 func NewParameterlessCommand(name string, handler ExecCommandHandler) Command {
-	return &customCommand{name, func([]string, int) []CompletionOption { return nil }, handler}
+	return &customCommand{
+		name:              name,
+		completionHandler: func([]string, int) []CompletionOption { return nil },
+		execHandler:       handler,
+	}
 }
 
 // NewCustomCommand returns a named command with completion and execution handler.
 func NewCustomCommand(name string, completionHandler CommandCompletionHandler, execHandler ExecCommandHandler) Command {
-	return &customCommand{name, completionHandler, execHandler}
+	return &customCommand{
+		name:              name,
+		completionHandler: completionHandler,
+		execHandler:       execHandler,
+	}
 }

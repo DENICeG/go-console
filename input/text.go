@@ -7,10 +7,10 @@ import (
 )
 
 type textEditor struct {
-	InsertMode bool
 	lines      [][]rune
 	caretLine  int
 	caretPos   int
+	InsertMode bool
 }
 
 func newTextEditor(str string) *textEditor {
@@ -19,7 +19,7 @@ func newTextEditor(str string) *textEditor {
 	for i := 0; i < len(strLines); i++ {
 		lines[i] = []rune(strLines[i])
 	}
-	return &textEditor{false, lines, 0, 0}
+	return &textEditor{InsertMode: false, lines: lines, caretLine: 0, caretPos: 0}
 }
 
 func (e *textEditor) Caret() (int, int) {

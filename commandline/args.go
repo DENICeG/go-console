@@ -52,8 +52,6 @@ func (c *completionOption) IsPartial() bool {
 	return c.isPartial
 }
 
-//TODO util func to easily map any slice/array/map to options with IsPartial flag
-
 // PrepareCompletionOptions returns a list of completion options with given isPartial flag.
 func PrepareCompletionOptions(list []string, isPartial bool) []CompletionOption {
 	options := make([]CompletionOption, len(list))
@@ -89,7 +87,7 @@ func NewOneOfArgCompletion(options ...string) ArgCompletion {
 	return &oneOfArgCompletion{options: PrepareCompletionOptions(options, false)}
 }
 
-func (a *oneOfArgCompletion) GetCompletionOptions(currentCommand []string, entryIndex int) []CompletionOption {
+func (a *oneOfArgCompletion) GetCompletionOptions(_ []string, _ int) []CompletionOption {
 	return a.options
 }
 
@@ -119,8 +117,6 @@ func LocalFileSystemCompletion(workingDir, currentCommandEntry string, withFiles
 			return nil, err
 		}
 	}
-
-	//TODO support for . and ..
 
 	var dir string
 	if filepath.IsAbs(currentCommandEntry) {
