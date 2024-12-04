@@ -146,7 +146,7 @@ func readCommandLine(prompt *string, currentCommand string, escapeHistory bool, 
 
 		switch key {
 		case console.KeyCtrlC:
-			return "", errCtrlC
+			return "", ErrCtrlC
 
 		case console.KeyEscape:
 			clearLine()

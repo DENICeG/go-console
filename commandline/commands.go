@@ -40,7 +40,7 @@ func NewExitCommand(name string) Command {
 	return &customCommand{
 		name:              name,
 		completionHandler: func([]string, int) []CompletionOption { return nil },
-		execHandler:       func([]string) error { return errExit },
+		execHandler:       func([]string) error { return ErrExit },
 	}
 }
 

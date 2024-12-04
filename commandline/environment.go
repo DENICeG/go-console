@@ -102,7 +102,7 @@ func (b *Environment) Run() error {
 
 		if len(cmd) > 0 {
 			if err := b.ExecCommand(cmd[0], cmd[1:]); err != nil {
-				if errors.Is(err, errExit) {
+				if errors.Is(err, ErrExit) {
 					return nil
 				}
 				if b.ErrorHandler == nil {
