@@ -2,7 +2,6 @@ package commandline
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -156,7 +155,7 @@ func LocalFileSystemCompletion(workingDir, currentCommandEntry string, withFiles
 		}
 	}
 
-	files, err := ioutil.ReadDir(dir)
+	files, err := os.ReadDir(dir)
 	if err != nil {
 		return nil, err
 	}

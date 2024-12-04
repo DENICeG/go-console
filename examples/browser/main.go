@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 
 	"github.com/sbreitf1/go-console"
@@ -42,7 +41,7 @@ func main() {
 	cle.RegisterCommand(commandline.NewParameterlessCommand("ls",
 		func(args []string) error {
 			// print current working dir content
-			files, err := ioutil.ReadDir("./")
+			files, err := os.ReadDir("./")
 			if err != nil {
 				return err
 			}
@@ -76,7 +75,7 @@ func main() {
 					return fmt.Errorf("path is a directory")
 				}
 
-				data, err := ioutil.ReadFile(args[0])
+				data, err := os.ReadFile(args[0])
 				if err != nil {
 					return err
 				}
@@ -90,7 +89,7 @@ func main() {
 			}
 
 			if ok {
-				if err := ioutil.WriteFile(args[0], []byte(newContent), os.ModePerm); err != nil {
+				if err := os.WriteFile(args[0], []byte(newContent), os.ModePerm); err != nil {
 					return err
 				}
 			}
