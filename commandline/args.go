@@ -12,7 +12,7 @@ import (
 // The returned options must include the current user input for the given entry and are filtered by the entered prefix.
 type CommandCompletionHandler func(currentCommand []string, entryIndex int) (options []CompletionOption)
 
-// CompletionOption deontes a completion option for a command.
+// CompletionOption denotes a completion option for a command.
 type CompletionOption interface {
 	fmt.Stringer
 	// Value denotes the full replacement string of the completed command part.

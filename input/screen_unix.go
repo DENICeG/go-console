@@ -28,6 +28,11 @@ func (s *unixScreen) Size() (int, int) {
 func (s *unixScreen) SetCell(x, y int, r rune) {
 	termbox.SetCell(x, y, r, termbox.ColorDefault, termbox.ColorDefault)
 }
+
+func (s *unixScreen) SetCellColored(x, y int, r rune) {
+	termbox.SetCell(x, y, r, termbox.ColorDefault, termbox.ColorDefault)
+}
+
 func (s *unixScreen) Flush() {
 	termbox.Flush()
 }
