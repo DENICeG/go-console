@@ -29,8 +29,12 @@ func (s *unixScreen) SetCell(x, y int, r rune) {
 	termbox.SetCell(x, y, r, termbox.ColorDefault, termbox.ColorDefault)
 }
 
-func (s *unixScreen) SetCellColored(x, y int, r rune) {
-	termbox.SetCell(x, y, r, termbox.ColorDefault, termbox.ColorDefault)
+func (s *unixScreen) SetCellColored(x, y int, r rune, foreground, background ARGB) {
+	termbox.SetCell(
+		x, y, r,
+		termbox.RGBToAttribute(foreground.Red, foreground.Green, foreground.Blue),
+		termbox.RGBToAttribute(background.Red, background.Green, background.Blue),
+	)
 }
 
 func (s *unixScreen) Flush() {

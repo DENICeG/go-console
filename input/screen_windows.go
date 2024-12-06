@@ -29,18 +29,32 @@ func newScreen() (screen, error) {
 func (s *windowsScreen) Clear() {
 	s.screen.Clear()
 }
+
 func (s *windowsScreen) Size() (int, int) {
 	return s.screen.Size()
 }
+
 func (s *windowsScreen) SetCell(x, y int, r rune) {
 	s.screen.SetContent(x, y, r, nil, tcell.StyleDefault)
 }
+
+func (s *windowsScreen) SetCellColored(x, y int, r rune, fg, bg ARGB) {
+	style := tcell.Style(0)
+
+	style = style.Background(tcell.NewRGBColor(int32(bg.Red), int32(bg.Green), int32(bg.Blue)))
+	style = style.Foreground(tcell.NewRGBColor(int32(fg.Red), int32(fg.Green), int32(fg.Blue)))
+
+	s.screen.SetContent(x, y, r, nil, style)
+}
+
 func (s *windowsScreen) Flush() {
 	s.screen.Sync()
 }
+
 func (s *windowsScreen) SetCursor(x, y int) {
 	s.screen.ShowCursor(x, y)
 }
+
 func (s *windowsScreen) PollEvent() event {
 	// wait for supported event
 	for {

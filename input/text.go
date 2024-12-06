@@ -133,31 +133,34 @@ func (e *textEditor) InsertAtCaret(str string) {
 
 		// move caret to end of inserted string
 		e.caretPos = caretPos + len([]rune(insertLines[0]))
-
-	} else {
-		targetCaretPos := len([]rune(insertLines[len(insertLines)-1]))
-
-		// first line first part of old line (to caret) and first line of inserted string
-		insertLines[0] = string(e.lines[caretLine][:caretPos]) + insertLines[0]
-		// last line is last line of inserted string and last part of old line (behind caret)
-		insertLines[len(insertLines)-1] = insertLines[len(insertLines)-1] + string(e.lines[caretLine][caretPos:])
-		// insert new lines to slice
-		newLines := make([][]rune, len(e.lines)+len(insertLines)-1)
-		for i := 0; i < caretLine; i++ {
-			newLines[i] = e.lines[i]
-		}
-		for i := 0; i < len(insertLines); i++ {
-			newLines[caretLine+i] = []rune(insertLines[i])
-		}
-		for i := (caretLine + 1); i < len(e.lines); i++ {
-			newLines[len(insertLines)+i-1] = e.lines[i]
-		}
-		e.lines = newLines
-
-		// move caret to end of inserted string
-		e.caretLine = caretLine + len(insertLines) - 1
-		e.caretPos = targetCaretPos
+		return
 	}
+
+	targetCaretPos := len([]rune(insertLines[len(insertLines)-1]))
+
+	// first line first part of old line (to caret) and first line of inserted string
+	insertLines[0] = string(e.lines[caretLine][:caretPos]) + insertLines[0]
+	// last line is last line of inserted string and last part of old line (behind caret)
+	insertLines[len(insertLines)-1] = insertLines[len(insertLines)-1] + string(e.lines[caretLine][caretPos:])
+	// insert new lines to slice
+	newLines := make([][]rune, len(e.lines)+len(insertLines)-1)
+	for i := 0; i < caretLine; i++ {
+		newLines[i] = e.lines[i]
+	}
+
+	for i := 0; i < len(insertLines); i++ {
+		newLines[caretLine+i] = []rune(insertLines[i])
+	}
+
+	for i := (caretLine + 1); i < len(e.lines); i++ {
+		newLines[len(insertLines)+i-1] = e.lines[i]
+	}
+
+	e.lines = newLines
+
+	// move caret to end of inserted string
+	e.caretLine = caretLine + len(insertLines) - 1
+	e.caretPos = targetCaretPos
 }
 
 func (e *textEditor) NewLineAtCaret() {
@@ -177,6 +180,7 @@ func (e *textEditor) RemoveLeftOfCaret() bool {
 		e.caretPos = caretPos - 1
 		return true
 	}
+
 	if caretPos == 0 && caretLine > 0 {
 		targetCaretPos := len(e.lines[caretLine-1])
 
@@ -196,6 +200,7 @@ func (e *textEditor) RemoveLeftOfCaret() bool {
 		e.caretPos = targetCaretPos
 		return true
 	}
+
 	return false
 }
 
@@ -211,18 +216,22 @@ func (e *textEditor) RemoveRightOfCaret() bool {
 		e.lines[caretLine] = []rune(prefix + suffix)
 		return true
 	}
+
 	if caretPos >= len(e.lines[caretLine]) && caretLine < len(e.lines)-1 {
 		newLines := make([][]rune, len(e.lines)-1)
 		for i := 0; i <= caretLine; i++ {
 			newLines[i] = e.lines[i]
 		}
+
 		newLines[caretLine] = append(e.lines[caretLine], e.lines[caretLine+1]...) //nolint
 		for i := (caretLine + 2); i < len(e.lines); i++ {
 			newLines[i-1] = e.lines[i]
 		}
 		e.lines = newLines
+
 		return true
 	}
+
 	return false
 }
 
@@ -230,13 +239,17 @@ func boundBy(val int, min, max int) int {
 	if val < min {
 		return min
 	}
+
 	if val > max {
 		return max
 	}
+
 	return val
 }
 
 // Text opens a full screen text editor in console mode and returns the entered string.
+//
+// Returns true if saved.
 func Text(str string) (string, bool, error) {
 	screen, err := newScreen()
 	if err != nil {
@@ -260,43 +273,12 @@ func Text(str string) (string, bool, error) {
 		editorHeight := viewportHeight - 3
 
 		// draw outer box
-		for x := editorOffsetX; x < (editorOffsetX + editorWidth); x++ {
-			screen.SetCell(x, editorOffsetY-1, '─')
-			screen.SetCell(x, editorOffsetY+editorHeight, '─')
-		}
-		for y := editorOffsetY; y < (editorOffsetY + editorHeight); y++ {
-			screen.SetCell(editorOffsetX-1, y, '│')
-			screen.SetCell(editorOffsetX+editorWidth, y, '│')
-		}
-		screen.SetCell(editorOffsetX-1, editorOffsetY-1, '┌')
-		screen.SetCell(editorOffsetX+editorWidth, editorOffsetY-1, '┐')
-		screen.SetCell(editorOffsetX-1, editorOffsetY+editorHeight, '└')
-		screen.SetCell(editorOffsetX+editorWidth, editorOffsetY+editorHeight, '┘')
+		drawBox(editorOffsetX, editorWidth, screen, editorOffsetY, editorHeight)
 
-		caretLine, caretPos := editor.Caret()
-		// ensure caret is visible
-		if caretLine < firstLine {
-			firstLine = caretLine
-		}
-		if caretLine >= (firstLine + editorHeight - 1) {
-			firstLine = caretLine - editorHeight + 1
-		}
-		if caretPos < firstPos {
-			firstPos = caretPos
-		}
-		if caretPos >= (firstPos + editorWidth - 1) {
-			firstPos = caretPos - editorWidth + 1
-		}
-		// set relative caret location
-		screen.SetCursor(editorOffsetX+caretPos-firstPos, editorOffsetY+caretLine-firstLine)
+		firstLine, firstPos = setCursor(editor, firstLine, editorHeight, firstPos, editorWidth, screen, editorOffsetX, editorOffsetY)
 
 		// print text
-		for i, line := range editor.LineRange(firstLine, editorHeight) {
-			runes := []rune(line)
-			for j := firstPos; j < min(len(runes), firstPos+editorWidth); j++ {
-				screen.SetCell(editorOffsetX+j-firstPos, editorOffsetY+i, runes[j])
-			}
-		}
+		printText(editor, firstLine, editorHeight, firstPos, editorWidth, screen, editorOffsetX, editorOffsetY)
 
 		printCells(screen, "Esc to exit", 1, editorOffsetY+editorHeight+1)
 		printCells(screen, "Strg+S to save", editorOffsetX+editorWidth-14, editorOffsetY+editorHeight+1)
@@ -359,4 +341,54 @@ func Text(str string) (string, bool, error) {
 			return "", false, e.Error
 		}
 	}
+}
+
+func setCursor(editor *textEditor, firstLine int, editorHeight int, firstPos int, editorWidth int, screen screen, editorOffsetX int, editorOffsetY int) (int, int) {
+	caretLine, caretPos := editor.Caret()
+	// ensure caret is visible
+	if caretLine < firstLine {
+		firstLine = caretLine
+	}
+
+	if caretLine >= (firstLine + editorHeight - 1) {
+		firstLine = caretLine - editorHeight + 1
+	}
+
+	if caretPos < firstPos {
+		firstPos = caretPos
+	}
+
+	if caretPos >= (firstPos + editorWidth - 1) {
+		firstPos = caretPos - editorWidth + 1
+	}
+
+	// set relative caret location
+	screen.SetCursor(editorOffsetX+caretPos-firstPos, editorOffsetY+caretLine-firstLine)
+	return firstLine, firstPos
+}
+
+func printText(editor *textEditor, firstLine int, editorHeight int, firstPos int, editorWidth int, screen screen, editorOffsetX int, editorOffsetY int) {
+	for i, line := range editor.LineRange(firstLine, editorHeight) {
+		runes := []rune(line)
+		for j := firstPos; j < min(len(runes), firstPos+editorWidth); j++ {
+			screen.SetCell(editorOffsetX+j-firstPos, editorOffsetY+i, runes[j])
+		}
+	}
+}
+
+func drawBox(editorOffsetX int, editorWidth int, screen screen, editorOffsetY int, editorHeight int) {
+	for x := editorOffsetX; x < (editorOffsetX + editorWidth); x++ {
+		screen.SetCell(x, editorOffsetY-1, '─')
+		screen.SetCell(x, editorOffsetY+editorHeight, '─')
+	}
+
+	for y := editorOffsetY; y < (editorOffsetY + editorHeight); y++ {
+		screen.SetCell(editorOffsetX-1, y, '│')
+		screen.SetCell(editorOffsetX+editorWidth, y, '│')
+	}
+
+	screen.SetCell(editorOffsetX-1, editorOffsetY-1, '┌')
+	screen.SetCell(editorOffsetX+editorWidth, editorOffsetY-1, '┐')
+	screen.SetCell(editorOffsetX-1, editorOffsetY+editorHeight, '└')
+	screen.SetCell(editorOffsetX+editorWidth, editorOffsetY+editorHeight, '┘')
 }
