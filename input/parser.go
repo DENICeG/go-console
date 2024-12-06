@@ -8,14 +8,14 @@ import (
 
 // IsANSIEscape checks if the given rune slice contains an ANSI escape sequence on the given index.
 func IsANSIEscape(input string, start int) bool {
-	const lenSequence = 5
+	const startSequence = `\x1b[`
+
+	lenSequence := len(startSequence)
 	if start+lenSequence >= len(input) {
 		return false
 	}
 
-	const startSequence = `\x1b[`
-
-	potentialEscapeSequence := input[start : start+5]
+	potentialEscapeSequence := input[start : start+lenSequence]
 
 	return potentialEscapeSequence == startSequence
 }
