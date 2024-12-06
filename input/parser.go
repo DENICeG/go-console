@@ -4,13 +4,14 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"unicode/utf8"
 )
 
 // IsANSIEscape checks if the given rune slice contains an ANSI escape sequence on the given index.
 func IsANSIEscape(input string, start int) bool {
 	const startSequence = `\x1b[`
 
-	lenSequence := len(startSequence)
+	lenSequence := utf8.RuneCountInString(startSequence)
 	if start+lenSequence >= len(input) {
 		return false
 	}
