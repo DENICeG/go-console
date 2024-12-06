@@ -2,19 +2,19 @@ package input
 
 import "github.com/sbreitf1/go-console"
 
-// ARGB is a ARGB color representation.
-type ARGB struct {
-	Alpha uint8
-	Red   uint8
-	Green uint8
-	Blue  uint8
+// RGB is a RGB color representation.
+type RGB struct {
+	R uint8
+	G uint8
+	B uint8
 }
 
 type screen interface {
 	Clear()
 	Size() (int, int)
 	SetCell(x, y int, r rune)
-	SetCellColored(x, y int, r rune, foreground, background ARGB)
+	SetCellColored(x, y int, r rune, foreground, background RGB)
+	GetDefaultColor() RGB
 	Flush()
 	SetCursor(x, y int)
 	PollEvent() event

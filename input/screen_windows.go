@@ -25,6 +25,11 @@ func newScreen() (screen, error) {
 
 	return &windowsScreen{screen}, nil
 }
+func (s *windowsScreen) GetDefaultColor() RGB {
+	fg, _, _ := tcell.StyleDefault.Decompose()
+	r, g, b := fg.RGB()
+	return RGB{R: uint8(r), G: uint8(g), B: uint8(b)}
+}
 
 func (s *windowsScreen) Clear() {
 	s.screen.Clear()
@@ -38,11 +43,11 @@ func (s *windowsScreen) SetCell(x, y int, r rune) {
 	s.screen.SetContent(x, y, r, nil, tcell.StyleDefault)
 }
 
-func (s *windowsScreen) SetCellColored(x, y int, r rune, fg, bg ARGB) {
+func (s *windowsScreen) SetCellColored(x, y int, r rune, fg, bg RGB) {
 	style := tcell.Style(0)
 
-	style = style.Background(tcell.NewRGBColor(int32(bg.Red), int32(bg.Green), int32(bg.Blue)))
-	style = style.Foreground(tcell.NewRGBColor(int32(fg.Red), int32(fg.Green), int32(fg.Blue)))
+	style = style.Background(tcell.NewRGBColor(int32(bg.R), int32(bg.G), int32(bg.B)))
+	style = style.Foreground(tcell.NewRGBColor(int32(fg.R), int32(fg.G), int32(fg.B)))
 
 	s.screen.SetContent(x, y, r, nil, style)
 }
@@ -114,5 +119,5 @@ func (s *windowsScreen) PollEvent() event {
 	}
 }
 func (s *windowsScreen) Close() {
-	s.screen.Fini()
+	s.screen.Fini() //nolint
 }

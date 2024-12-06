@@ -19,6 +19,11 @@ func newScreen() (screen, error) {
 	return &unixScreen{}, nil
 }
 
+func (s *unixScreen) GetDefaultColor() RGB {
+	r, g, b := termbox.AttributeToRGB(termbox.ColorDefault)
+	return RGB{r, g, b}
+}
+
 func (s *unixScreen) Clear() {
 	termbox.Clear(termbox.ColorDefault, termbox.ColorDefault) //nolint
 }
@@ -29,11 +34,11 @@ func (s *unixScreen) SetCell(x, y int, r rune) {
 	termbox.SetCell(x, y, r, termbox.ColorDefault, termbox.ColorDefault)
 }
 
-func (s *unixScreen) SetCellColored(x, y int, r rune, foreground, background ARGB) {
+func (s *unixScreen) SetCellColored(x, y int, r rune, foreground, background RGB) {
 	termbox.SetCell(
 		x, y, r,
-		termbox.RGBToAttribute(foreground.Red, foreground.Green, foreground.Blue),
-		termbox.RGBToAttribute(background.Red, background.Green, background.Blue),
+		termbox.RGBToAttribute(foreground.R, foreground.G, foreground.B),
+		termbox.RGBToAttribute(background.R, background.G, background.B),
 	)
 }
 

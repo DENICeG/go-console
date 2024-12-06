@@ -272,12 +272,10 @@ func Text(str string) (string, bool, error) {
 		editorWidth := viewportWidth - 2
 		editorHeight := viewportHeight - 3
 
-		// draw outer box
 		drawBox(editorOffsetX, editorWidth, screen, editorOffsetY, editorHeight)
 
 		firstLine, firstPos = setCursor(editor, firstLine, editorHeight, firstPos, editorWidth, screen, editorOffsetX, editorOffsetY)
 
-		// print text
 		printText(editor, firstLine, editorHeight, firstPos, editorWidth, screen, editorOffsetX, editorOffsetY)
 
 		printCells(screen, "Esc to exit", 1, editorOffsetY+editorHeight+1)
@@ -368,10 +366,24 @@ func setCursor(editor *textEditor, firstLine int, editorHeight int, firstPos int
 }
 
 func printText(editor *textEditor, firstLine int, editorHeight int, firstPos int, editorWidth int, screen screen, editorOffsetX int, editorOffsetY int) {
+	currentColor := screen.GetDefaultColor()
+
 	for i, line := range editor.LineRange(firstLine, editorHeight) {
 		runes := []rune(line)
 		for j := firstPos; j < min(len(runes), firstPos+editorWidth); j++ {
-			screen.SetCell(editorOffsetX+j-firstPos, editorOffsetY+i, runes[j])
+			if IsANSIEscape(line, j) {
+				if IsANSIReset(line, j) {
+					currentColor = screen.GetDefaultColor()
+					j += 3
+				} else {
+					sequence, end := ReadANSISequence(line, j)
+					currentColor = ExtractRGB(sequence)
+					j = end
+					continue
+				}
+			}
+
+			screen.SetCellColored(editorOffsetX+j-firstPos, editorOffsetY+i, runes[j], currentColor, screen.GetDefaultColor())
 		}
 	}
 }
