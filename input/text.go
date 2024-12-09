@@ -374,7 +374,7 @@ func printText(editor *textEditor, firstLine int, editorHeight int, firstPos int
 			if IsANSIEscape(line, j) {
 				if IsANSIReset(line, j) {
 					currentColor = screen.GetDefaultColor()
-					j += 2 // skip ANSI start sequence \x1b[
+					j += 4 // skip ANSI start sequence & ansi reset sequence \x1b[0m
 				} else {
 					sequence, end := ReadANSISequence(line, j)
 					currentColor = ExtractRGB(sequence)

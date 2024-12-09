@@ -42,7 +42,7 @@ func Test_ReadANSISequence(t *testing.T) {
 
 func Test_IsANSIReset(t *testing.T) {
 	t.Run("Is ANSI reset sequence", func(t *testing.T) {
-		const testData = "[0m"
+		const testData = "\x1b[0m"
 		result := input.IsANSIReset(testData, 0)
 		require.True(t, result, "Expected ANSI reset sequence")
 	})

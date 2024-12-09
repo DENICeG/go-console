@@ -69,14 +69,22 @@ func ExtractRGB(input string) RGB {
 
 // IsANSIReset checks if the given rune slice contains an ANSI reset sequence on the given index.
 func IsANSIReset(input string, start int) bool {
-	resetFound := input[start] == '['
-	if !resetFound {
+	if utf8.RuneCountInString(input) < start+3 {
 		return false
 	}
 
-	if start+2 > len(input) {
+	const expectedFirstRune = rune('\x1b')
+	firstRune := rune(input[start])
+	if firstRune != expectedFirstRune {
 		return false
 	}
 
-	return input[start+1] == '0' && input[start+2] == 'm'
+	const expectedSecondRune = rune('[')
+	secondRune := rune(input[start+1])
+	match := secondRune == expectedSecondRune
+	if !match {
+		return false
+	}
+
+	return input[start+2] == '0' && input[start+3] == 'm'
 }
