@@ -9,23 +9,29 @@ import (
 
 // IsANSIEscape checks if the given rune slice contains an ANSI escape sequence on the given index.
 func IsANSIEscape(input string, start int) bool {
-	const startSequence = `\x1b[`
+	isUTF8 := utf8.ValidString(input)
+	println("input is utf8", isUTF8)
 
-	lenSequence := utf8.RuneCountInString(startSequence)
-	if start+lenSequence >= len(input) {
+	const expectedFirstRune = rune('\x1b')
+	firstRune := rune(input[start])
+	if firstRune != expectedFirstRune {
 		return false
 	}
 
-	potentialEscapeSequence := input[start : start+lenSequence]
+	if utf8.RuneCountInString(input) < start+1 {
+		return false
+	}
 
-	return potentialEscapeSequence == startSequence
+	const expectedSecondRune = rune('[')
+	secondRune := rune(input[start+1])
+	return secondRune == expectedSecondRune
 }
 
 // ReadANSISequence reads an ANSI escape sequence from the given rune slice and returns the sequence and the end index.
 func ReadANSISequence(input string, start int) (string, int) {
 	var sb strings.Builder
 
-	for i := start; i < len(input); i++ {
+	for i := start; i < utf8.RuneCountInString(input); i++ {
 		if input[i] == 'm' {
 			sb.WriteByte(input[i])
 			return sb.String(), i + 1
