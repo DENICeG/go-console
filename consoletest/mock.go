@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/sbreitf1/go-console"
+	"github.com/DENICeG/go-console/v2"
 
 	"github.com/stretchr/testify/assert"
 )

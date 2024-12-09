@@ -3,7 +3,7 @@ package input
 import (
 	"strings"
 
-	"github.com/sbreitf1/go-console"
+	"github.com/DENICeG/go-console/v2"
 )
 
 type textEditor struct {
@@ -371,17 +371,23 @@ func printText(editor *textEditor, firstLine int, editorHeight int, firstPos int
 	for i, line := range editor.LineRange(firstLine, editorHeight) {
 		runes := []rune(line)
 		for j := firstPos; j < min(len(runes), firstPos+editorWidth); j++ {
-			if IsANSIEscape(line, j) {
-				if IsANSIReset(line, j) {
-					currentColor = screen.GetDefaultColor()
-					j += 4 // skip ANSI start sequence & ansi reset sequence \x1b[0m
-				} else {
-					sequence, end := ReadANSISequence(line, j)
-					currentColor = ExtractRGB(sequence)
-					j = end
-					continue
-				}
-			}
+			// If syntax highlighting is a thing in the future
+			// if IsANSIEscape(line, j) {
+			// 	if IsANSIReset(line, j) {
+			// 		currentColor = screen.GetDefaultColor()
+			// 		j += 3 // skip ANSI start sequence & ansi reset sequence \x1b[0m
+			// 		continue
+			// 	} else {
+			// 		sequence, end := ReadANSISequence(line, j)
+			// 		currentColor = ExtractRGB(sequence)
+			// 		j = end - 1
+			// 		continue
+			// 	}
+			// }
+
+			// currentRune := string(runes[j])
+			// if currentRune != " " {
+			// }
 
 			screen.SetCellColored(editorOffsetX+j-firstPos, editorOffsetY+i, runes[j], currentColor, screen.GetDefaultColor())
 		}

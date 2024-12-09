@@ -3,7 +3,7 @@ package commandline
 import (
 	"errors"
 
-	"github.com/sbreitf1/go-console"
+	"github.com/DENICeG/go-console/v2"
 )
 
 // Environment represents a command line interface environment with history and auto-completion.
@@ -30,7 +30,7 @@ func NewEnvironment() *Environment {
 		},
 		CompleteUnknownCommand: nil,
 		ErrorHandler: func(_ string, _ []string, err error) error {
-			if errors.Is(err, errCommandPanicked{}) {
+			if errors.Is(err, ErrCommandPanicked{}) {
 				console.Printlnf("PANIC: %s", err.Error()) //nolint
 			} else {
 				console.Printlnf("ERROR: %s", err.Error()) //nolint
@@ -163,7 +163,7 @@ func (b *Environment) ExecCommand(cmd string, args []string) error {
 	}()
 
 	if recovered != nil {
-		return ErrCommandPanicked(recovered)
+		return NewErrCommandPanicked(recovered)
 	}
 	return err
 }

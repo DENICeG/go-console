@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/sbreitf1/go-console"
-	"github.com/sbreitf1/go-console/commandline"
+	"github.com/DENICeG/go-console/v2"
+	"github.com/DENICeG/go-console/v2/commandline"
 )
 
 func main() {

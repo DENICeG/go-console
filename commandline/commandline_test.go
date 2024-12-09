@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/sbreitf1/go-console"
-	"github.com/sbreitf1/go-console/consoletest"
+	"github.com/DENICeG/go-console/v2"
+	"github.com/DENICeG/go-console/v2/consoletest"
 
 	"github.com/stretchr/testify/assert"
 )

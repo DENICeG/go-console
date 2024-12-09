@@ -1,7 +1,7 @@
 package commandline
 
 import (
-	"github.com/sbreitf1/go-console"
+	"github.com/DENICeG/go-console/v2"
 )
 
 // LineHistory defines the interface to a history of raw lines.

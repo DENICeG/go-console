@@ -1,6 +1,6 @@
 package input
 
-import "github.com/sbreitf1/go-console"
+import "github.com/DENICeG/go-console/v2"
 
 // RGB is a RGB color representation.
 type RGB struct {

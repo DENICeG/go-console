@@ -1,8 +1,10 @@
 package main
 
 import (
-	"github.com/sbreitf1/go-console"
-	"github.com/sbreitf1/go-console/commandline"
+	"errors"
+
+	"github.com/DENICeG/go-console/v2"
+	"github.com/DENICeG/go-console/v2/commandline"
 )
 
 func main() {
@@ -17,7 +19,7 @@ func main() {
 	for {
 		cmd, err := commandline.ReadCommand("command", opts)
 		if err != nil {
-			if commandline.IsErrCtrlC(err) {
+			if errors.Is(err, commandline.ErrCtrlC) {
 				console.Println()
 				break
 			}

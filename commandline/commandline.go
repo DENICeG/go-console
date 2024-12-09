@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sbreitf1/go-console"
+	"github.com/DENICeG/go-console/v2"
 )
 
 const (

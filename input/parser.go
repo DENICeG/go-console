@@ -9,9 +9,6 @@ import (
 
 // IsANSIEscape checks if the given rune slice contains an ANSI escape sequence on the given index.
 func IsANSIEscape(input string, start int) bool {
-	isUTF8 := utf8.ValidString(input)
-	println("input is utf8", isUTF8)
-
 	const expectedFirstRune = rune('\x1b')
 	firstRune := rune(input[start])
 	if firstRune != expectedFirstRune {

@@ -23,15 +23,15 @@ func ErrUnknownCommand(commandName string) error {
 	return errUnknownCommand{commandName}
 }
 
-type errCommandPanicked struct {
+type ErrCommandPanicked struct {
 	recovered any
 }
 
-func (e errCommandPanicked) Error() string {
+func (e ErrCommandPanicked) Error() string {
 	return fmt.Sprintf("%v", e.recovered)
 }
 
-// ErrCommandPanicked returns a new error that indicates a panicked command.
-func ErrCommandPanicked(recovered any) error {
-	return errCommandPanicked{recovered}
+// NewErrCommandPanicked returns a new error that indicates a panicked command.
+func NewErrCommandPanicked(recovered any) error {
+	return ErrCommandPanicked{recovered}
 }

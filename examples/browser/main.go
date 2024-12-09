@@ -1,12 +1,13 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
-	"github.com/sbreitf1/go-console"
-	"github.com/sbreitf1/go-console/commandline"
-	"github.com/sbreitf1/go-console/input"
+	"github.com/DENICeG/go-console/v2"
+	"github.com/DENICeG/go-console/v2/commandline"
+	"github.com/DENICeG/go-console/v2/input"
 )
 
 func main() {
@@ -99,7 +100,7 @@ func main() {
 
 	if err := cle.Run(); err != nil {
 		console.Println()
-		if !commandline.IsErrCtrlC(err) {
+		if !errors.Is(err, commandline.ErrCtrlC) {
 			console.Fatallnf("Run failed: %s", err.Error())
 		}
 	}
