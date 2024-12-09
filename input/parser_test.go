@@ -50,13 +50,13 @@ func Test_IsANSIReset(t *testing.T) {
 
 func Test_ExtractRGB(t *testing.T) {
 	t.Run("Extract RGB from ANSI escape", func(t *testing.T) {
-		const testData = `\x1b[38;2;117;113;94m`
+		const testData = "\x1b[38;2;117;113;94m"
 		rgb := input.ExtractRGB(testData)
 		require.Equal(t, input.RGB{R: 117, G: 113, B: 94}, rgb)
 	})
 
 	t.Run("Extract RGB from invalid ANSI escape", func(t *testing.T) {
-		const testData = `\x1b[38;2;117m`
+		const testData = "\x1b[38;2;117m"
 		rgb := input.ExtractRGB(testData)
 		require.Equal(t, input.RGB{}, rgb)
 	})

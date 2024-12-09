@@ -45,7 +45,7 @@ func ReadANSISequence(input string, start int) (string, int) {
 
 // ExtractRGB extracts the RGB values from an ANSI escape sequence.
 func ExtractRGB(input string) RGB {
-	regex := regexp.MustCompile(`\\x1b\[(?P<FLAGS>\d{1,3});(?P<MODE>\d{1,3});(?P<R>\d{1,3});(?P<G>\d{1,3});(?P<B>\d{1,3})m`)
+	regex := regexp.MustCompile("\x1b\\[(?P<FLAGS>\\d{1,3});(?P<MODE>\\d{1,3});(?P<R>\\d{1,3});(?P<G>\\d{1,3});(?P<B>\\d{1,3})m")
 	matches := regex.FindStringSubmatch(input)
 
 	if len(matches) != 6 {
